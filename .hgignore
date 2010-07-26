@@ -8,3 +8,4 @@ Release
 *.nds
 *.bin
 *.elf
+.DS_Store
