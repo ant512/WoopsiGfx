@@ -1,7 +1,8 @@
+#include <nds.h>
 #include "bitmap.h"
 #include "framebuffer.h"
 #include "graphics.h"
-#include <nds.h>
+#include "newtopaz.h"
 
 using namespace WoopsiGfx;
 
@@ -26,6 +27,7 @@ int main(int argc, char* argv[]) {
 	Rect rect(0, 0, 100, 100);							// Clipping region
 	Graphics gfx(&bmp, rect);							// Graphics object we use to draw
 	FrameBuffer buffer((u16*)BG_BMP_RAM(0), 256, 192);	// Frame buffer we will copy to
+	NewTopaz font;										// Font we will write with
 	
 	// Draw a simple picture
 	gfx.drawFilledRect(0, 0, 100, 100, woopsiRGB(5, 5, 5));		// Clear background
@@ -39,6 +41,11 @@ int main(int argc, char* argv[]) {
 	gfx.floodFill(0, 50, woopsiRGB(20, 20, 20));				// Fill left triangle
 	gfx.dim(80, 0, 20, 100);									// Dim right edge
 	gfx.drawLine(80, 0, 80, 100, woopsiRGB(20, 20, 20));		// Right edge border
+	
+	gfx.drawText(17, 0, &font, "Hello World!", 0, 17, woopsiRGB(31, 31, 31));		// Top text
+	gfx.drawText(0, 90, &font, "This is some text", 0, 17, woopsiRGB(31, 31, 31));	// Bottom text
+	
+	gfx.drawFilledXORRect(0, 0, 50, 100, woopsiRGB(31, 0, 0));	// XOR left of bitmap against red
 		
 	// Get a graphics object to draw to the frame buffer
 	Graphics* fbgfx = buffer.newGraphics();
