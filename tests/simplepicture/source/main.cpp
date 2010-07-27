@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 	s16 xAdd = 1;
 	s16 yAdd = 1;
 	
-	while(1) {§
+	while(1) {
 		swiWaitForVBlank();
 		
 		// Clear the existing box
