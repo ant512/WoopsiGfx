@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 	gfx.drawFilledRect(20, 20, 20, 60, woopsiRGB(5, 5, 20));	// Blue box
 	gfx.drawFilledEllipse(50, 50, 20, 10, woopsiRGB(31, 0, 0));	// Red ellipse
 	gfx.drawFilledRect(10, 80, 60, 5, woopsiRGB(10, 20, 10));	// Green box
-	gfx.floodFill(90, 50, woopsiRGB(10, 10, 10));				// Fill right  triangle
+	gfx.floodFill(90, 50, woopsiRGB(10, 10, 10));				// Fill right triangle
 	gfx.floodFill(50, 90, woopsiRGB(15, 15, 15));				// Fill bottom triangle
 	gfx.floodFill(0, 50, woopsiRGB(20, 20, 20));				// Fill left triangle
 	gfx.dim(80, 0, 20, 100);									// Dim right edge

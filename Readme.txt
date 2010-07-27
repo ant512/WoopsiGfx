@@ -8,7 +8,7 @@ WoopsiGfx
   monochrome and 16-bit fonts out of the box.
   
   WoopsiGfx can also be used to draw directly to the DS' VRAM.  This is useful
-  when the DS is in MODE_FB0 or MODE_5_2D mode.
+  when the DS is in MODE_FB0 or MODE_5_2D.
   
 
 Features
@@ -38,11 +38,7 @@ Features
   - Object-orientated design for easy integration into other C++ software;
   - Simple API;
   - Unicode strings encoded with UTF-8;
-  - Suite of supporting Windows tools:
-    - bmp2font, to convert BMPs to Woopsi fonts;
-    - font2bmp, to convert Windows fonts to BMP images;
-    - bmp2bmp, to convert BMPs to Woopsi bitmaps;
-    - font2font, to convert Windows fonts to Woopsi fonts.
+  - Compatible with Woopsi font tools.
 
 
 Requirements
