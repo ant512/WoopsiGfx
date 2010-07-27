@@ -49,7 +49,26 @@ Requirements
 ------------
 
   To compile the project you need devKitPro.
-   
+
+
+Installation
+------------
+
+  Create a new directory called "libwoopsigfx" in your devkitPro directory.  In
+  Windows, for example, this would typically be "C:\devkitPro".  Copy the
+  "icon", "lib" and "include" directories from this archive into the new
+  directory.  In Windows, you will end up with the following directory
+  structure:
+  
+    C:\devkitPro\libwoopsigfx\icon
+	C:\devkitPro\libwoopsigfx\include
+	C:\devkitPro\libwoopsigfx\lib
+
+  Once you've done this, you can test the installation by trying to compile the
+  "simplepicture" example project in the "tests" folder of this archive.  Open
+  a shell, navigate to its directory, and type "make".  If this successfully
+  produces a ROM file then the installation worked.
+	
 
 Credits and Acknowledgements
 ---------------------------
