@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+  V1.1
+  
+  - Fixes:
+    - PackedFont1 clips correctly.
+
   V1.00
   
   - Initial release.
