@@ -36,7 +36,6 @@ void BufferedBitmap::setPixel(s16 x, s16 y, u16 colour) {
 
 	// Plot the pixel
 	u32 pos = (y * _width) + x;
-	rememberWrite(pos, 1);	
 	_bitmap[pos] = colour;
 }
 
@@ -62,13 +61,11 @@ Graphics* BufferedBitmap::newGraphics() {
 
 void BufferedBitmap::blit(const s16 x, const s16 y, const u16* data, const u32 size) {
 	u32 pos = (y * _width) + x;
-	rememberWrite(pos, size);	
 	woopsiDmaCopy(data, _bitmap + pos, size);
 }
 
 void BufferedBitmap::blitFill(const s16 x, const s16 y, const u16 colour, const u32 size) {
 	u32 pos = (y * _width) + x;
-	rememberWrite(pos, size);	
 	woopsiDmaFill(colour, _bitmap + pos, size);
 }
 
@@ -78,22 +75,9 @@ void BufferedBitmap::copy(s16 x, s16 y, u32 size, u16* dest) const {
 }
 
 void BufferedBitmap::buffer() {
-	_bufferedData.clear();
-	woopsiDmaCopy(_buffer, _bitmap, _width * _height);
+	woopsiDmaCopy(_bitmap, _buffer, _width * _height);
 }
 
 void BufferedBitmap::unbuffer() {
-	for (int i = 0; i < _bufferedData.size(); ++i) {
-		woopsiDmaCopy(_bitmap, _buffer + _bufferedData[i].pos, _bufferedData[i].length);
-	}
-	
-	_bufferedData.clear();
-}
-
-void BufferedBitmap::rememberWrite(u32 pos, u32 length) {
-	BufferedDataItem data;
-	data.pos = pos;
-	data.length = length;
-	
-	_bufferedData.push_back(data);
+	woopsiDmaCopy(_buffer, _bitmap, _width * _height);
 }

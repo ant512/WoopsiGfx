@@ -1,5 +1,5 @@
 #include <nds.h>
-#include "bitmap.h"
+#include "bufferedbitmap.h"
 #include "framebuffer.h"
 #include "graphics.h"
 #include "newtopaz.h"
@@ -23,7 +23,7 @@ void initGfxMode() {
 int main(int argc, char* argv[]) {
 	initGfxMode();
 
-	Bitmap bmp(100, 100);								// Bitmap we will draw to
+	BufferedBitmap bmp(100, 100);						// Bitmap we will draw to
 	Rect rect(0, 0, 100, 100);							// Clipping region
 	Graphics gfx(&bmp, rect);							// Graphics object we use to draw
 	FrameBuffer buffer((u16*)BG_BMP_RAM(0), 256, 192);	// Frame buffer we will copy to
@@ -46,40 +46,36 @@ int main(int argc, char* argv[]) {
 	gfx.drawText(0, 90, &font, "This is some text", 0, 17, woopsiRGB(31, 31, 31));	// Bottom text
 	
 	gfx.drawFilledXORRect(0, 0, 50, 100, woopsiRGB(31, 0, 0));	// XOR left of bitmap against red
+	
+	// Buffer the current bitmap contents
+	bmp.buffer();
 		
 	// Get a graphics object to draw to the frame buffer
 	Graphics* fbgfx = buffer.newGraphics();
 	
-	// Bouncing box every VBL
-	s16 x = 10;
-	s16 y = 10;
+	s16 x = 0;
+	s16 y = 0;
 	s16 xAdd = 1;
-	s16 yAdd = 1;
 	
 	while(1) {
 		swiWaitForVBlank();
 		
-		// Clear the existing box
-		fbgfx->drawFilledRect(x, y, 100, 100, woopsiRGB(0, 0, 0));
-		
 		x += xAdd;
-		y += yAdd;
 		
-		// Draw the bitmap to the framebuffer
-		fbgfx->drawBitmap(x, y, 100, 100, &bmp, 0, 0);
-		
-		// Swap bounce directions
-		if ((xAdd < 0) && (x < 0)) {
+		if (x < 0) {
+			x = 0;
 			xAdd = 1;
-		} else if ((xAdd > 0) && (x > 155)) {
+		} else if (x > bmp.getWidth() - 1) {
+			x = bmp.getWidth() - 1;
 			xAdd = -1;
 		}
 		
-		if ((yAdd < 0) && (y < 0)) {
-			yAdd = 1;
-		} else if ((yAdd > 0) && (y > 91)) {
-			yAdd = -1;
-		}
+		gfx.drawLine(x, y, 50, 50, woopsiRGB(31, 0, 0));
+		
+		// Draw the bitmap to the framebuffer
+		fbgfx->drawBitmap(10, 10, 100, 100, &bmp, 0, 0);
+		
+		bmp.unbuffer();
 	}
 	
 	// Clean up the framebuffer graphics object
