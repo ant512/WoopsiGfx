@@ -1,5 +1,5 @@
 #include <nds.h>
-#include "bitmap.h"
+#include "bufferedbitmap.h"
 #include "framebuffer.h"
 #include "graphics.h"
 #include "newtopaz.h"
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
 		swiWaitForVBlank();
 		
 		// Clear the existing box
-		fbgfx->drawFilledRect(x, y, 100, 100, woopsiRGB(0, 0, 0));
+		//fbgfx->drawFilledRect(x, y, 100, 100, woopsiRGB(0, 0, 0));
 		
 		x += xAdd;
 		y += yAdd;
