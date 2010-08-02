@@ -10,8 +10,16 @@ namespace WoopsiGfx {
 	class Graphics;
 
 	/**
-	 * Class providing bitmap manipulation (drawing, etc) functions.  Creates a new
-	 * internal bitmap data array and uses it to draw onto.
+	 * Class providing a bitmap that can be drawn to.  Creates two new internal
+	 * bitmap data arrays, one of which represents the bitmap, and one of which
+	 * is a buffered copy of the bitmap.  Calling buffer() before drawing to the
+	 * bitmap allows unbuffer() to be called later to restore the original state
+	 * of the bitmap.
+	 * 
+	 * The most obvious use for this is if animated drawing is being done to a
+	 * picture (for example, a box is being moved across a background image) and
+	 * the picture must be restored to its original state before the next
+	 * animated frame is drawn.
 	 */
 	class BufferedBitmap : public MutableBitmapBase {
 	public:
@@ -101,25 +109,26 @@ namespace WoopsiGfx {
 		 */
 		void copy(s16 x, s16 y, u32 size, u16* dest) const;
 		
+		/**
+		 * Create an internal copy of the bitmap's current state that can be
+		 * restored later with unbuffer().
+		 */
 		void buffer();
+		
+		/**
+		 * Restores previously stored state of the bitmap created with the
+		 * buffer() method.
+		 */
 		void unbuffer();
 
 	protected:
-		typedef struct {
-			u32 pos;
-			u32 length;
-		} BufferedDataItem;
-	
 		u16* _bitmap __attribute__ ((aligned (4)));		/**< Bitmap */
 		u16* _buffer __attribute__ ((aligned (4)));		/**< Buffer */
-		WoopsiArray<BufferedDataItem> _bufferedData;
 		
 		/**
 		 * Copy constructor is protected to prevent usage.
 		 */
 		inline BufferedBitmap(const BufferedBitmap& bitmap) { };
-		
-		void rememberWrite(u32 pos, u32 length);
 	};
 }
 
