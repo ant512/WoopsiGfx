@@ -5,6 +5,10 @@ Change Log
   
   - Fixes:
     - PackedFont1 clips correctly.
+  
+  - New Features:
+    - Added BufferedBitmap class.
+    - Added buffer test.
 
   V1.00
   
