@@ -19,6 +19,8 @@ Features
   - Animation class with support for variable framerates and standard/pingpong
     looping;
   - Bitmap class for 16-bit bitmap image manipulation;
+  - BufferedBitmap class that can restore itself to a previous state, undoing
+    drawing operations;
   - Graphics class providing clipped, DMA-accelerated drawing functions:
     - Pixels;
     - Lines;
