@@ -53,27 +53,58 @@ int main(int argc, char* argv[]) {
 	// Get a graphics object to draw to the frame buffer
 	Graphics* fbgfx = buffer.newGraphics();
 	
-	s16 x = 0;
-	s16 y = 0;
+	s16 x = 10;
+	s16 y = 10;
 	s16 xAdd = 1;
+	s16 yAdd = 1;
+	
+	s16 ellipseX = 10;
+	s16 ellipseY = 10;
+	s16 ellipseXAdd = 1;
+	s16 ellipseYAdd = 1;
 	
 	while(1) {
 		swiWaitForVBlank();
 		
-		x += xAdd;
+		gfx.drawFilledEllipse(ellipseX, ellipseY, 20, 10, woopsiRGB(31, 0, 0));
 		
-		if (x < 0) {
-			x = 0;
+		// Clear the existing box
+		fbgfx->drawFilledRect(x, y, 100, 100, woopsiRGB(0, 0, 0));
+		
+		x += xAdd;
+		y += yAdd;
+		
+		ellipseX += ellipseXAdd;
+		ellipseY += ellipseYAdd;
+		
+		// Draw the bitmap to the framebuffer
+		fbgfx->drawBitmap(x, y, 100, 100, &bmp, 0, 0);
+		
+		// Swap bounce directions
+		if ((xAdd < 0) && (x < 0)) {
 			xAdd = 1;
-		} else if (x > bmp.getWidth() - 1) {
-			x = bmp.getWidth() - 1;
+		} else if ((xAdd > 0) && (x > 155)) {
 			xAdd = -1;
 		}
 		
-		gfx.drawLine(x, y, 50, 50, woopsiRGB(31, 0, 0));
+		if ((yAdd < 0) && (y < 0)) {
+			yAdd = 1;
+		} else if ((yAdd > 0) && (y > 91)) {
+			yAdd = -1;
+		}
 		
-		// Draw the bitmap to the framebuffer
-		fbgfx->drawBitmap(10, 10, 100, 100, &bmp, 0, 0);
+		// Swap ellipse
+		if ((ellipseXAdd < 0) && (ellipseX < 0)) {
+			ellipseXAdd = 1;
+		} else if ((ellipseXAdd > 0) && (ellipseX > 100)) {
+			ellipseXAdd = -1;
+		}
+		
+		if ((ellipseYAdd < 0) && (ellipseY < 0)) {
+			ellipseYAdd = 1;
+		} else if ((ellipseYAdd > 0) && (ellipseY > 91)) {
+			ellipseYAdd = -1;
+		}
 		
 		bmp.unbuffer();
 	}
