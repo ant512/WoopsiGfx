@@ -5,11 +5,12 @@ Change Log
   
   - Fixes:
     - PackedFont1 clips correctly.
+    - Example makefiles no longer build ROMs other than .nds file.
   
   - New Features:
     - Added BufferedBitmap class.
     - Added buffer test.
 
-  V1.00
+  V1.00 (20100727)
   
   - Initial release.
