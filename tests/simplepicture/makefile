@@ -1,11 +1,11 @@
-# Woopsi Makefile 											ex:set ts=4 sw=4:
-# builds the Woopsi demo application, and should be sufficient for most
+# WoopsiGfx Makefile 										ex:set ts=4 sw=4:
+# builds the WoopsiGfx test applications, and should be sufficient for most
 # needs - options are switched on/off with USE_ constants.
 
 # set the texts that appear in the loader menus
 TEXT1 		:= Demo Project
-TEXT2 		:= using Woopsi
-TEXT3 		:= woopsi.sourceforge.net
+TEXT2 		:= using WoopsiGfx
+TEXT3 		:= ant.simianzombie.com
 
 # 4-bit-deep bitmap file to use as icon in loader menus
 ICON 		:= $(DEVKITPRO)/libwoopsigfx/icon/logo.bmp
@@ -25,13 +25,6 @@ RELEASE     :=  Release
 SOURCES		:=	source data gfx
 INCLUDES	:=	include
 DEFINES		:=
-
-#-------------------------------------------------------------------------------
-# If USE_WOOPSI is defined, compile/link against Woopsi
-# If USE_FAT is defined, compile/link against libfat
-#-------------------------------------------------------------------------------
-USE_WOOPSI		= 1
-#USE_FAT		= 1
 
 # we do *not* do -o thing - WinterMute points out that this stops our
 # resultant .nds from working on some loaders.  By default, ndstool puts boot
@@ -81,10 +74,6 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 
 # from here on, any symbols we want to propagate into the real build must be
 # exported - all the lines above the 'ifneq' are evaluated in both cases...
-
-# make sure selected options are visible in the recursive call...
-#export USE_WOOPSI
-#export USE_FAT
 
 # directory name is used to construct the target.nds filename
 export OUTPUT	:=	$(CURDIR)/$(RELEASE)/$(TARGET)
@@ -153,10 +142,7 @@ $(OUTPUT).nds		: 	$(OFILES)
 # ./include directory which needs to be passed with -I to the C(++) compiler
 #-------------------------------------------------------------------------------
 LIBDIRS		+= $(DEVKITPRO)/libnds
-
-ifneq ($(USE_WOOPSI),)
 LIBDIRS		+= $(DEVKITPRO)/libwoopsigfx
-endif
 
 # add all directories specified in INCLUDES and SOURCES
 _INCS		+= $(foreach dir,$(INCLUDES),-I$(CURDIR)/../$(dir))
@@ -182,36 +168,15 @@ _LPATHS		:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
 
 _DEFS		= $(DEFINES)
 
-# WIFI
-# MIKMOD?
-
-# use Woopsi
-ifneq ($(USE_WOOPSI),)
+# use WoopsiGfx
 _INCS		+= -I$(DEVKITPRO)/libwoopsigfx/include
 _LIBS		+= -L$(DEVKITPRO)/libwoopsigfx/lib -lwoopsigfx
-endif
-
-# use FAT
-ifneq ($(USE_FAT),)
-_DEFS		+= -DUSE_FAT 
-_INCS		+= -I$(DEVKITPRO)/libfat/include
-_LIBS		+= -L$(DEVKITPRO)/libfat/lib -lfat 
-endif
 
 # and of course we need libnds
 _LIBS		+= -lnds9
 
 # this makes it easier to type the ndstool command line
 _BANNER 		:= -b $(ICON) "$(TEXT1);$(TEXT2);$(TEXT3)"
-
-#-------------------------------------------------------------------------------
-# rule to build the alternate loader versions - unneeded on R4, etc
-#
-%.ds.gba: %.nds
-	@dsbuild $< 
-	@echo Built: $(notdir $@)
-	@cp $(CURDIR)/../$(RELEASE)/$(notdir $@) ../$(RELEASE)/$(notdir $(OUTPUT)).sc.nds 
-	@echo Built: $(notdir $(OUTPUT)).sc.nds
 
 #-------------------------------------------------------------------------------
 # rule to build a .nds binary - forces the link every time because we don't have proper
@@ -339,8 +304,4 @@ endif
 # and
 #
 # Woopsi is installed in $(DEVKITPRO)/libwoopsi
-# libfat is installed in $(DEVKITPRO)/libfat (instead of $(DEVKITPRO)/libnds)
-# 
-# In the future, this will support libefs, wifi, etc using similiar directory
-# structures.
 ################################################################################
