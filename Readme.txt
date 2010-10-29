@@ -62,10 +62,18 @@ Installation
 	C:\devkitPro\libwoopsigfx\include
 	C:\devkitPro\libwoopsigfx\lib
 
-  Once you've done this, you can test the installation by trying to compile the
-  "simplepicture" example project in the "tests" folder of this archive.  Open
-  a shell, navigate to its directory, and type "make".  If this successfully
-  produces a ROM file then the installation worked.
+  Alternatively, if you have installed devKitPro to the default directory
+  (C:\devkitPro in Windows, or /opt/devkitpro in Linux/OSX), you can run the
+  deploy script in the libwoopsigfx folder of this archive.  Windows users
+  should double-click the "deploy.bat" file.  Linux/OSX users should open a
+  shell, navigate to the libwoopsigfx folder, and run "sudo bash deploy.sh".
+  Type in your password when prompted.  These scripts will copy the necessary
+  files automatically.
+
+  Once you've done installed WoopsiGfx, you can test the installation by trying
+  to compile the "simplepicture" example project in the "tests" folder of this
+  archive.  Open a shell, navigate to its directory, and type "make".  If this
+  successfully produces a ROM file then the installation worked.
 	
 
 Credits and Acknowledgements
