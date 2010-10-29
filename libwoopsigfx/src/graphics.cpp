@@ -5,7 +5,6 @@
 
 using namespace WoopsiGfx;
 
-// Constructor - allocates mem for bitmap
 Graphics::Graphics(MutableBitmapBase* bitmap, const Rect& clipRect) {
 
 	_bitmap = bitmap;

@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+  V1.2
+  
+  - Fixes:
+    - PackedFont1 and PackedFont16 clipping fix.
+
   V1.1
   
   - Fixes:
