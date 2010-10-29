@@ -46,7 +46,7 @@ Features
 Requirements
 ------------
 
-  To compile the project you need devKitPro.
+  To compile the project you need devKitARM.
 
 
 Installation
