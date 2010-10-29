@@ -4,7 +4,7 @@ Change Log
   V1.1
   
   - Fixes:
-    - PackedFont1 clips correctly.
+    - PackedFonts clip correctly.
     - Example makefiles no longer build ROMs other than .nds file.
   
   - New Features:
