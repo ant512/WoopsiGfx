@@ -1,7 +1,7 @@
 Change Log
 ----------
 
-  V1.2
+  V1.2 (20101210)
   
   - Fixes:
     - Updated Rect class with new functionality from Woopsi.
