@@ -49,8 +49,6 @@ Rect* fromCoordinates(s16 x1, s16 y1, s16 x2, s16 y2) {
 	return new Rect(x1, y1, width, height);
 }
 
-
-
 void Rect::getIntersect(const Rect& rect, Rect& dest) const {
 	s16 x1 = x > rect.getX() ? x : rect.getX();
 	s16 y1 = y > rect.getY() ? y : rect.getY();
@@ -60,8 +58,8 @@ void Rect::getIntersect(const Rect& rect, Rect& dest) const {
 
 	dest.setX(x1);
 	dest.setY(y1);
-	dest.setX2(x2);
-	dest.setY2(y2);
+	dest.setWidth(x2 - x1 + 1);
+	dest.setHeight(y2 - y1 + 1);
 }
 
 void Rect::setX2(s16 x2) {
@@ -97,8 +95,8 @@ void Rect::getAddition(const Rect& rect, Rect& dest) const {
 
 	dest.setX(x1);
 	dest.setY(y1);
-	dest.setX2(x2);
-	dest.setY2(y2);
+	dest.setWidth(x2 - x1 + 1);
+	dest.setHeight(y2 - y1 + 1);
 }
 
 void Rect::clipToIntersect(const Rect& rect) {
@@ -122,8 +120,8 @@ void Rect::expandToInclude(const Rect& rect) {
 }
 
 bool Rect::hasDimensions() const {
-	if (!width) return false;
-	if (!height) return false;
+	if (width < 1) return false;
+	if (height < 1) return false;
 	return true;
 }
 
@@ -139,14 +137,35 @@ Rect Rect::operator+(const Rect& rect) {
 	return dest;
 }
 
+bool Rect::operator==(const Rect& rect) {
+	return (x == rect.x &&
+			y == rect.y &&
+			width == rect.width &&
+			height == rect.height);
+}
+
+bool Rect::operator!=(const Rect& rect) {
+	return !(this->operator== (rect));
+}
+
 bool Rect::intersects(const Rect& rect) const {
 
-	if ((x + width > rect.getX()) &&
-		(y + height > rect.getY()) &&
-		(x < rect.getX() + rect.getWidth()) &&
-		(y < rect.getY() + rect.getHeight())) {
-		return true;
-	}
+	return ((x + width > rect.getX()) &&
+			(y + height > rect.getY()) &&
+			(x < rect.getX() + rect.getWidth()) &&
+			(y < rect.getY() + rect.getHeight()));
+}
 
-	return false;
+bool Rect::contains(s16 x, s16 y) const {
+	return ((x >= this->x) &&
+			(y >= this->y) &&
+			(x < this->x + this->width) &&
+			(y < this->y + this->height));
+}
+
+void Rect::copyTo(Rect& rect) const {
+	rect.setX(x);
+	rect.setY(y);
+	rect.setWidth(width);
+	rect.setHeight(height);
 }

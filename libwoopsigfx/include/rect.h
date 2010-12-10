@@ -109,6 +109,7 @@ namespace WoopsiGfx {
 		 * Set the x co-ordinate of the rect's bottom-right corner.  If x2 is less
 		 * than the rect's current x co-ordinate the method automatically adjusts
 		 * the co-ords so that the rect's width is never negative.
+		 * Changing this property will change the width of the rect.
 		 * @param x2 The x co-ordinate of the rect's bottom-right corner.
 		 */
 		void setX2(s16 x2);
@@ -117,6 +118,7 @@ namespace WoopsiGfx {
 		 * Set the y co-ordinate of the rect's bottom-right corner.  If y2 is less
 		 * than the rect's current y co-ordinate the method automatically adjusts
 		 * the co-ords so that the rect's height is never negative.
+		 * Changing this property will change the height of the rect.
 		 * @param y2 The y co-ordinate of the rect's bottom-right corner.
 		 */
 		void setY2(s16 y2);
@@ -135,7 +137,8 @@ namespace WoopsiGfx {
 
 		/**
 		 * Determines if the rectangle has two dimensions; in other words, does it
-		 * have both height and width?
+		 * have both height and width?  Negative width or height is
+		 * considered not to be valid.
 		 * @return True if the rect has height and width; false if not.
 		 */
 		bool hasDimensions() const;
@@ -173,11 +176,26 @@ namespace WoopsiGfx {
 		 * @return True if the rect intersects this; false if not.
 		 */
 		bool intersects(const Rect& rect) const;
+		
+		/**
+		 * Check if the rect contains the supplied point.
+		 * @param x X co-ord of the point.
+		 * @param y Y co-ord of the point.
+		 * @return True if the rect contains the point; false if not.
+		 */
+		bool contains(s16 x, s16 y) const;
+
+		/**
+		 * Copy the properties of this rect to the destination rect.
+		 * @param dest Destination rect to copy to.
+		 */
+		void copyTo(Rect& dest) const;
 
 		/**
 		 * Overloaded & operator.  Returns the intersect of this rectangle and the
 		 * rectangle passed as the "rect" argument".
 		 * @param rect The rectangle to intersect with this.
+		 * @return The intersect of this rect with the argument.
 		 */
 		Rect operator&(const Rect& rect);
 
@@ -185,8 +203,25 @@ namespace WoopsiGfx {
 		 * Overloaded + operator.  Returns the smallest rectangle that can contain
 		 * this rectangle and the rectangle passed as the "rect" argument".
 		 * @param rect The rectangle to add to this.
+		 * @return The smallest rect that contains this and the argument.
 		 */
 		Rect operator+(const Rect& rect);
+		
+		/**
+		 * Overloaded == operator.  Checks if the dimensions of the supplied
+		 * rect are the same as this rect.
+		 * @param rect The rect to compare with this.
+		 * @return True if the dimensions are equal; false if not.
+		 */
+		bool operator==(const Rect& rect);
+
+		/**
+		 * Overloaded != operator.  Checks if the dimensions of the supplied
+		 * rect are not the same as this rect.
+		 * @param rect The rect to compare with this.
+		 * @return True if the dimensions are not equal; false if they are.
+		 */
+		bool operator!=(const Rect& rect);
 	};
 }
 
