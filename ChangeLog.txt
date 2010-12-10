@@ -1,7 +1,12 @@
 Change Log
 ----------
 
-  V1.1
+  V1.2
+  
+  - Fixes:
+    - Updated Rect class with new functionality from Woopsi.
+
+  V1.1 (20101029)
   
   - Fixes:
     - PackedFonts clip correctly.
