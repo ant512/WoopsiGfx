@@ -5,7 +5,7 @@
 
 using namespace WoopsiGfx;
 
-u16 PackedFontBase::getCharWidth(u32 letter) const {
+u8 PackedFontBase::getCharWidth(u32 letter) const {
 	if (_fontWidth) return _fontWidth;
 
 	if (letter < _first || letter > _last) return _spWidth;
@@ -27,11 +27,12 @@ u16 PackedFontBase::getStringWidth(const WoopsiString& text, s32 startIndex, s32
 	u16 total = 0;
 
 	StringIterator* iterator = text.newStringIterator();
-	if (!iterator->moveTo(startIndex)) return 0;
+	if (iterator->moveTo(startIndex)) {
 	
-	do {
-		total += getCharWidth(iterator->getCodePoint());
-	} while (iterator->moveToNext() && (iterator->getIndex() < startIndex + length));
+		do {
+			total += getCharWidth(iterator->getCodePoint());
+		} while (iterator->moveToNext() && (iterator->getIndex() < startIndex + length));
+	}
 
 	delete iterator;
 
