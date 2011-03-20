@@ -23,11 +23,7 @@ Rect::Rect(const Rect& rect) {
 	this->height = rect.getHeight();
 }
 
-Rect* fromDimensions(s16 x, s16 y, s32 width, s32 height) {
-	return new Rect(x, y, width, height);
-}
-
-Rect* fromCoordinates(s16 x1, s16 y1, s16 x2, s16 y2) {
+Rect fromCoordinates(s16 x1, s16 y1, s16 x2, s16 y2) {
 
 	// Ensure x2 is the larger value
 	if (x2 < x1) {
@@ -46,7 +42,7 @@ Rect* fromCoordinates(s16 x1, s16 y1, s16 x2, s16 y2) {
 	s32 width = (x2 - x1) + 1;
 	s32 height = (y2 - y1) + 1;
 
-	return new Rect(x1, y1, width, height);
+	return Rect(x1, y1, width, height);
 }
 
 void Rect::getIntersect(const Rect& rect, Rect& dest) const {
@@ -149,7 +145,6 @@ bool Rect::operator!=(const Rect& rect) {
 }
 
 bool Rect::intersects(const Rect& rect) const {
-
 	return ((x + width > rect.getX()) &&
 			(y + height > rect.getY()) &&
 			(x < rect.getX() + rect.getWidth()) &&
@@ -168,4 +163,79 @@ void Rect::copyTo(Rect& rect) const {
 	rect.setY(y);
 	rect.setWidth(width);
 	rect.setHeight(height);
+}
+
+bool Rect::splitIntersection(const Rect& rect, Rect& intersection, WoopsiArray<Rect>* remainderRects) const {
+
+	if (!intersects(rect)) return false;
+
+	// Copy the properties of rect into intersection; we trim this to size later
+	intersection.x = rect.x;
+	intersection.y = rect.y;
+	intersection.width = rect.width;
+	intersection.height = rect.height;
+
+	// Check for a non-overlapped rect on the left
+	if (intersection.x < x) {
+		Rect left;
+		left.x = intersection.x;
+		left.y = intersection.y;
+		left.width = x - intersection.x;
+		left.height = intersection.height;
+		
+		// Insert the rect
+		remainderRects->push_back(left);
+		
+		// Adjust the dimensions of the intersection
+		intersection.x = x;
+		intersection.width -= left.width;
+	}
+	
+	// Check for a non-overlapped rect on the right
+	if (intersection.x + intersection.width > x + width) {
+		Rect right;
+		right.x = x + width;
+		right.y = intersection.y;
+		right.width = intersection.width - (x + width - intersection.x);
+		right.height = intersection.height;
+		
+		// Insert the rect
+		remainderRects->push_back(right);
+		
+		// Adjust dimensions of the intersection
+		intersection.width -= right.width;
+	}
+	
+	// Check for a non-overlapped rect above
+	if (intersection.y < y) {
+		Rect top;
+		top.x = intersection.x;
+		top.y = intersection.y;
+		top.width = intersection.width;
+		top.height = y - intersection.y;
+		
+		// Insert the rect
+		remainderRects->push_back(top);
+		
+		// Adjust the dimensions of the intersection
+		intersection.y = y;
+		intersection.height -= top.height;
+	}
+	
+	// Check for a non-overlapped rect below
+	if (intersection.y + intersection.height > y + height) {
+		Rect bottom;
+		bottom.x = intersection.x;
+		bottom.y = y + height;
+		bottom.width = intersection.width;
+		bottom.height = intersection.height - (y + height - intersection.y);
+		
+		// Insert the rect
+		remainderRects->push_back(bottom);
+		
+		// Adjust dimensions of the intersection
+		intersection.height -= bottom.height;
+	}
+	
+	return true;
 }

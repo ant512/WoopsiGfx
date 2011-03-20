@@ -1,46 +1,48 @@
+#include <ctype.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
-#include "woopsistring.h"
 #include "stringiterator.h"
+#include "woopsistring.h"
 
 using namespace WoopsiGfx;
 
 WoopsiString::WoopsiString() {
-	_text = NULL;
-	_dataLength = 0;
-	_stringLength = 0;
-	_allocatedSize = 0;
-	_growAmount = 32;
+	init();
 }
 
 WoopsiString::WoopsiString(const char* text) {
-	_text = NULL;
-	_dataLength = 0;
-	_stringLength = 0;
-	_allocatedSize = 0;
-	_growAmount = 32;
-
+	init();
 	setText(text);
 }
 
 WoopsiString::WoopsiString(const u32 text) {
-	_text = NULL;
-	_dataLength = 0;
-	_stringLength = 0;
-	_allocatedSize = 0;
-	_growAmount = 32;
-
+	init();
 	setText(text);
 }
 
 WoopsiString::WoopsiString(const WoopsiString& string) {
+	init();
+	setText(string);
+}
+
+WoopsiString::WoopsiString(const WoopsiString& string, const s32 startIndex) {
+	init();
+	setText(string, startIndex, string.getLength());
+}
+
+WoopsiString::WoopsiString(const WoopsiString& string, const s32 startIndex, const s32 length) {
+	init();
+	setText(string, startIndex, length);
+}
+
+void WoopsiString::init() {
 	_text = NULL;
 	_dataLength = 0;
 	_stringLength = 0;
 	_allocatedSize = 0;
 	_growAmount = 32;
-
-	setText(string);
-};
+}
 
 WoopsiString& WoopsiString::operator=(const WoopsiString& string) {
 	if (&string != this) {
@@ -60,8 +62,41 @@ WoopsiString& WoopsiString::operator=(const u32 letter) {
 	return *this;
 }
 
+WoopsiString& WoopsiString::operator+=(const WoopsiString& string) {
+	append(string);
+	
+	return *this;
+}
+
+WoopsiString WoopsiString::operator+(const WoopsiString& string) {
+	WoopsiString str = *this;
+	str.append(string);
+	
+	return str;
+}
+
 StringIterator* WoopsiString::newStringIterator() const {
 	return new StringIterator(this);
+}
+
+void WoopsiString::setText(const WoopsiString& text, const s32 startIndex, const s32 length) {
+
+	StringIterator* iterator = text.newStringIterator();
+	if (!iterator->moveTo(startIndex)) return;
+
+	// Build up the string character by character.  This is slower than
+	// a straightforward memcpy(), but it avoids multiple calls to getToken().
+	// The difference in speed between this method and a more long-winded, lower
+	// level approach is probably minimal.  This method gets bounds checking for
+	// free.
+	s32 count = 0;
+	while (count < length) {
+		append(iterator->getCodePoint());
+		if (!iterator->moveToNext()) break;
+		count++;
+	}
+
+	delete iterator;
 }
 
 void WoopsiString::setText(const WoopsiString& text) {
@@ -275,6 +310,9 @@ void WoopsiString::remove(const s32 startIndex, const s32 count) {
 }
 
 const u32 WoopsiString::getCharAt(s32 index) const {
+	if (index < 0) return 0;
+	if (index >= getLength()) return 0;
+	
 	const char* token = getToken(index);
 	return getCodePoint(token, NULL);
 }
@@ -345,38 +383,19 @@ const s32 WoopsiString::lastIndexOf(u32 letter, s32 startIndex, s32 count) const
 	return index;
 }
 
-WoopsiString* WoopsiString::subString(s32 startIndex) const {
-	return subString(startIndex, getLength() - startIndex);
+WoopsiString WoopsiString::subString(s32 startIndex) const {
+	return WoopsiString(startIndex, getLength() - startIndex);
 }
 
-WoopsiString* WoopsiString::subString(s32 startIndex, s32 length) const {
-	WoopsiString* subString = new WoopsiString();
-	StringIterator* iterator = newStringIterator();
-	if (!iterator->moveTo(startIndex)) return NULL;
-
-	// Build up the string character by character.  This is slower than
-	// a straightforward memcpy(), but as we don't know how many bytes
-	// are in the requested substring we can't pre-allocate a buffer for
-	// the memcpy().  The only possible way to achieve this is to use a
-	// two-pass algorithm that firstly gets the number of bytes in the
-	// substring, then performs the memcpy().  However, the method used
-	// here is probably just as fast, as the string always over-allocates.
-	s32 count = 0;
-	while (count < length) {
-		subString->append(iterator->getCodePoint());
-		iterator->moveToNext();
-		count++;
-	}
-
-	delete iterator;
-
-	return subString;
+WoopsiString WoopsiString::subString(s32 startIndex, s32 length) const {
+	return WoopsiString(startIndex, length);
 }
 
 void WoopsiString::allocateMemory(s32 chars, bool preserve) {
 
 	// Do we already have enough memory allocated to contain this new size?
-	// If so, we can avoid deallocating and allocating new memory by re-using the old
+	// If so, we can avoid deallocating and allocating new memory by re-using
+	// the old
 	
 	if (chars > _allocatedSize) {
 
@@ -414,7 +433,8 @@ s32 WoopsiString::filterString(char* dest, const char* src, s32 sourceBytes, s32
 
 		if (bytes == 0) {
 
-			// This utf-8 token is corrupt; ignore the first char and find a new utf-8 token
+			// This utf-8 token is corrupt; ignore the first char and find a new
+			// utf-8 token
 			src++;
 		} else {
 
@@ -432,6 +452,8 @@ s32 WoopsiString::filterString(char* dest, const char* src, s32 sourceBytes, s32
 
 u32 WoopsiString::getCodePoint(const char* string, u8* numChars) const {
 	char char0 = *string;
+
+	if (numChars) *numChars = 0;
 
 	// 0xxxxxxx ASCII char
 	if (char0 < 0x80) {
@@ -497,17 +519,17 @@ u32 WoopsiString::getCodePoint(const char* string, u8* numChars) const {
 
 const char* WoopsiString::encodeCodePoint(u32 codepoint, u8* numBytes) const {
 	
-	*numBytes = 0;
+	if (numBytes) *numBytes = 0;
 	
 	if (codepoint < 0x80) {
-		*numBytes = 1;
+		if (numBytes) *numBytes = 1;
 		char* buffer = new char[1];
 		buffer[0] = codepoint;
 		return buffer;
 	}
 
 	if (codepoint < 0x0800) {
-		*numBytes = 2;
+		if (numBytes) *numBytes = 2;
 		char* buffer = new char[2];
 		buffer[0] = (codepoint >> 6) + 0xC0;
 		buffer[1] = (codepoint & 0x1F) + 0x80;
@@ -515,7 +537,7 @@ const char* WoopsiString::encodeCodePoint(u32 codepoint, u8* numBytes) const {
 	}
 
 	if (codepoint < 0x10000) {
-		*numBytes = 3;
+		if (numBytes) *numBytes = 3;
 		char* buffer = new char[3];
 		buffer[0] = (codepoint >> 12) + 0xE0;
 		buffer[1] = ((codepoint >> 6) & 0x3F) + 0x80;
@@ -524,7 +546,7 @@ const char* WoopsiString::encodeCodePoint(u32 codepoint, u8* numBytes) const {
 	}
 	
 	if (codepoint < 0x10FFFF) {
-		*numBytes = 4;
+		if (numBytes) *numBytes = 4;
 		char* buffer = new char[4];
 		buffer[0] = (codepoint >> 18) + 0xF0;
 		buffer[1] = ((codepoint >> 12) & 0x3F) + 0x80;
@@ -537,6 +559,264 @@ const char* WoopsiString::encodeCodePoint(u32 codepoint, u8* numBytes) const {
 	return NULL;
 }
 
-s32 WoopsiString::compareTo(const WoopsiString& string) const {
-	return strncmp(_text, string.getCharArray(), getLength());
+s8 WoopsiString::compareTo(const WoopsiString& string, bool caseSensitive) const {
+	
+	StringIterator* iterator1 = newStringIterator();
+	StringIterator* iterator2 = string.newStringIterator();
+	
+	u32 codePoint1;
+	u32 codePoint2;
+
+	// Get the length of the shortest string
+	u32 length = getLength() < string.getLength() ? getLength() : string.getLength();
+	
+	// Iterate over the string length that both strings possess and check for
+	// differences.
+	for (u32 i = 0; i < length; ++i) {
+		codePoint1 = iterator1->getCodePoint();
+		codePoint2 = iterator2->getCodePoint();
+		
+		// If we are ignoring case, we can adjust any upper-case letters so that
+		// they are treated as their lower-case variant by adding a constant.
+		if (!caseSensitive) {
+			if (isupper(codePoint1)) codePoint1 += 0x20;
+			if (isupper(codePoint2)) codePoint2 += 0x20;
+		}
+
+		// We cheat a little here to get a passable natural sort.  Numbers will
+		// automatically be sorted before text due to the fact that they come
+		// first in the ASCII table.  When we hit two numbers at the same point
+		// in the strings, though, we can convert the digit sequences to ints
+		// and compare those.
+		if (isdigit(codePoint1) && isdigit(codePoint2)) {
+
+			u32 charCount1 = 0;
+			u32 charCount2 = 0;
+
+			codePoint1 = iterator1->getInteger(&charCount1);
+			codePoint2 = iterator2->getInteger(&charCount2);
+
+			if (codePoint1 != codePoint2) {
+				delete iterator1;
+				delete iterator2;
+				
+				return codePoint1 > codePoint2 ? 1 : -1;
+			}
+
+			// Stop iterating if we hit the end of either string
+			if (!iterator1->moveTo(iterator1->getIndex() + charCount1) ||
+				!iterator2->moveTo(iterator2->getIndex() + charCount2)) break;
+		} else {
+	    
+			if (codePoint1 != codePoint2) {
+				delete iterator1;
+				delete iterator2;
+				
+				return codePoint1 > codePoint2 ? 1 : -1;
+			}
+			
+			// We can potentially hit the end of a string early if we
+			// encountered a run of digits at any point - we will have consumed
+			// and compared
+			// multiple characters in a single iteration.  In that situation we
+			// need to exit the loop early.
+			if (!iterator1->moveToNext() || !iterator2->moveToNext()) break;
+		}
+	}
+	
+	delete iterator1;
+	delete iterator2;
+	
+	// Strings are identical so far, so compare based on string length.  Shorter
+	// string comes first
+	if (getLength() == string.getLength()) return 0;
+	if (getLength() < string.getLength()) return -1;
+	
+	return 1;
+}
+
+s32 WoopsiString::indexOf(const char* text) const {
+	return indexOf(text, 0, getLength());
+}
+
+s32 WoopsiString::indexOf(const char* text, s32 startIndex) const {
+	return indexOf(text, startIndex, getLength() - startIndex);
+}
+
+s32 WoopsiString::indexOf(const WoopsiString& text, s32 startIndex, s32 count) const {
+
+	// Exit if no data available
+	if (!hasData()) return -1;
+	if (!text.hasData()) return -1;
+
+	s32 index = -1;
+	s32 charsExamined = 0;
+	
+	StringIterator* srciter = newStringIterator();
+	StringIterator* finditer = text.newStringIterator();
+	
+	if (!srciter->moveTo(startIndex)) return -1;
+
+	do {
+		bool equal = true;
+		s32 idx = srciter->getIndex();
+
+		finditer->moveToFirst();
+		
+		do {
+			if (srciter->getCodePoint() != finditer->getCodePoint()) {
+				equal = false;
+				break;
+			}
+		} while (finditer->moveToNext() && srciter->moveToNext());
+
+		if (!srciter->moveTo(idx)) break;
+		
+		if(equal && !finditer->moveToNext()) {
+			index = srciter->getIndex();
+			break;
+		}
+		
+		charsExamined++;
+	} while (srciter->moveToNext() && (charsExamined < count));
+	
+	
+	delete srciter;
+	delete finditer;
+	
+	return index;
+}
+
+s32 WoopsiString::lastIndexOf(const char* text) const {
+	return lastIndexOf(text, getLength() - 1, getLength());
+}
+
+s32 WoopsiString::lastIndexOf(const char* text, s32 startIndex) const {
+	return lastIndexOf(text, startIndex, getLength() - (getLength() - startIndex));
+}
+
+s32 WoopsiString::lastIndexOf(const WoopsiString& text, s32 startIndex, s32 count) const {
+
+	// Exit if no data available
+	if (!hasData()) return -1;
+	if (!text.hasData()) return -1;
+
+	s32 index = -1;
+	s32 charsExamined = 0;
+
+	StringIterator* srciter = newStringIterator();
+	StringIterator* finditer = text.newStringIterator();
+	if (!srciter->moveTo(startIndex)) return -1;
+
+	do {
+		bool equal = true;
+		s32 idx = srciter->getIndex();
+				
+		finditer->moveToLast();
+				
+		do {
+			if (srciter->getCodePoint() != finditer->getCodePoint()) {
+				equal = false;
+				break;
+			}
+		} while (finditer->moveToPrevious() && srciter->moveToPrevious());
+
+		if (!srciter->moveTo(idx)) break;
+				
+		if(equal && !finditer->moveToPrevious()) {
+			index = srciter->getIndex() - text.getLength() + 1;
+			break;
+		}
+				
+		charsExamined++;
+	} while (srciter->moveToPrevious() && (charsExamined <= count));
+
+	delete srciter;
+	delete finditer;
+	
+	return index;
+}
+
+void WoopsiString::format(const char *format, ...) {
+	va_list args;
+	va_start(args, format);
+	this->format(format, args);
+	va_end(args);
+}
+
+void WoopsiString::format(const char *format, va_list args) {
+
+	// Do the format once to get the length.
+	char ch;
+	s32 len = vsnprintf(&ch, 1, format, args);
+
+	if (len < 1) {
+		setText("");
+	} else {
+
+		// Allocate with malloc to prevent us from overflowing the DS' tiny
+		// stack
+		char* buffer = new char[len + 1];
+
+		// Format again; this time the buffer is guaranteed to be large enough
+		// (unless malloc failed, in which case we're stuck anyway)
+		vsnprintf(buffer, len + 1, format, args);
+
+		setText(buffer);
+
+		delete[] buffer;
+	}
+}
+
+void WoopsiString::replace(const WoopsiString& oldText, const WoopsiString& newText) {
+	replace(oldText, newText, 0, -1);
+}
+
+void WoopsiString::replace(const WoopsiString& oldText, const WoopsiString& newText, const s32 startIndex) {
+	replace(oldText, newText, startIndex, -1);
+}
+
+void WoopsiString::replace(const s32 startIndex, const s32 count, const WoopsiString& newText) {
+
+	// This is inefficient as it involves an awful lot of seeking through the
+	// string.  However, it is good enough for the limited amount of use this
+	// method should get.
+	remove(startIndex, count);
+	insert(newText, startIndex);
+}
+
+void WoopsiString::replace(const WoopsiString& oldText, const WoopsiString& newText, const s32 startIndex, const s32 replaceCount) {
+	s32 count = replaceCount;
+	s32 startPos = startIndex;
+	s32 endPos;
+
+	while (count != 0 && (endPos = indexOf(oldText, startPos, getLength() - startPos)) != -1) {
+		replace(endPos, oldText.getLength(), newText);
+		startPos = endPos + newText.getLength();
+
+		if(count!=-1) count--;
+	}
+}
+
+void WoopsiString::split(const WoopsiString& separator, WoopsiArray<WoopsiString>& result) const {
+	split(separator, true, result);
+}
+
+void WoopsiString::split(const WoopsiString& separator, bool allowEmptyEntries, WoopsiArray<WoopsiString>& result) const {
+	result.clear();
+
+	s32 startPos = 0;
+	s32 endPos;
+
+	while ((endPos = indexOf(separator, startPos, getLength() - startPos)) != -1) {
+		if (allowEmptyEntries || startPos != endPos) {
+			result.push_back(subString(startPos, endPos - startPos));
+		}
+
+		startPos = endPos + separator.getLength();
+	}
+
+	if (allowEmptyEntries || startPos != getLength()) {
+		result.push_back(subString(startPos));
+	}
 }
