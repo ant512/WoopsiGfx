@@ -1,22 +1,25 @@
 #ifndef _WOOPSI_STRING_H_
 #define _WOOPSI_STRING_H_
 
+#include <stdarg.h>
 #include <nds.h>
+#include "woopsiarray.h"
 
 namespace WoopsiGfx {
 	
 	class StringIterator;
 
 	/**
-	 * Unicode string class.  Uses UTF-8 encoding.  For optimal performance, use
-	 * the StringIterator class to iterate over a WoopsiString instance.
+	 * Unicode mutable string class.  Uses UTF-8 encoding.  For optimal
+	 * performance, use the StringIterator class to iterate over a WoopsiString
+	 * instance.
 	 *
-	 * Where possible, the string avoids allocating memory
-	 * each time the string grows or shrinks.  This means that the string may
-	 * consume more memory than the number of chars would seem to dictate if the
-	 * object previously contained a large string that has subsequently been
-	 * truncated.  It also means that increasing the length of such a string is
-	 * a cheaper operation as memory does not need to allocated and copied.
+	 * Where possible, the string avoids allocating memory each time the string
+	 * grows or shrinks.  This means that the string may consume more memory
+	 * than the number of chars would seem to dictate if the object previously
+	 * contained a large string that has subsequently been truncated.  It also
+	 * means that increasing the length of such a string is a cheaper operation
+	 * as memory does not need to allocated and copied.
 	 *
 	 * Additionally, the string increases its array size by _growAmount every
 	 * time it needs to allocate extra memory, potentially reducing the number
@@ -30,7 +33,7 @@ namespace WoopsiGfx {
 	public:
 
 		/**
-		 * Constructor to create a blank object.
+		 * Constructor to create a blank string.
 		 */
 		WoopsiString();
 
@@ -52,6 +55,23 @@ namespace WoopsiGfx {
 		 * @param string WoopsiString object to create a copy of.
 		 */
 		WoopsiString(const WoopsiString& string);
+
+		/**
+		 * Constructor that creates a copy of the supplied string from
+		 * startIndex onwards (ie. it creates a substring).
+		 * @param string WoopsiString object to create a copy of.
+		 * @param startIndex The index to copy from.
+		 */
+		WoopsiString(const WoopsiString& string, const s32 startIndex);
+
+		/**
+		 * Constructor that creates a copy of the supplied string from
+		 * startIndex until startIndex + count (ie. it creates a substring).
+		 * @param string WoopsiString object to create a copy of.
+		 * @param startIndex The index to copy from.
+		 * @param length The number of characters to copy.
+		 */
+		WoopsiString(const WoopsiString& string, const s32 startIndex, const s32 length);
 
 		/**
 		 * Destructor.
@@ -79,6 +99,14 @@ namespace WoopsiGfx {
 		 * @param buffer Buffer to copy the internal char array to.
 		 */
 		virtual void copyToCharArray(char* buffer) const;
+
+		/**
+		 * Set the text in the string to be a substring of the supplied text.
+		 * @param text WoopsiString containing the new data for this string.
+		 * @param startIndex The starting point of the substring.
+		 * @param length The length of the substring.
+		 */
+		virtual void setText(const WoopsiString& text, const s32 startIndex, const s32 length);
 		
 		/**
 		 * Set the text in the string.
@@ -210,23 +238,19 @@ namespace WoopsiGfx {
 		virtual const s32 lastIndexOf(u32 letter, s32 startIndex, s32 count) const;
 
 		/**
-		 * Get a substring from this string.  It is the responsibility of the
-		 * caller to delete the substring when it is no longer required.
+		 * Get a substring from this string.
 		 * @param startIndex The starting point of the substring.
-		 * @return A pointer to a new WoopsiString object containing the
-		 * substring.
+		 * @return A new WoopsiString object containing the substring.
 		 */
-		WoopsiString* subString(s32 startIndex) const;
+		WoopsiString subString(s32 startIndex) const;
 
 		/**
-		 * Get a substring from this string.  It is the responsibility of the
-		 * caller to delete the substring when it is no longer required.
+		 * Get a substring from this string.
 		 * @param startIndex The starting point of the substring.
 		 * @param length The length of the substring.
-		 * @return A pointer to a new WoopsiString object containing the
-		 * substring.
+		 * @return A new WoopsiString object containing the substring.
 		 */
-		WoopsiString* subString(s32 startIndex, s32 length) const;
+		WoopsiString subString(s32 startIndex, s32 length) const;
 		
 		/**
 		 * Overloaded assignment operator.  Copies the data within the argument
@@ -253,17 +277,206 @@ namespace WoopsiGfx {
 		WoopsiString& operator=(u32 letter);
 
 		/**
+		 * Overloaded addition operator.  Creates a copy of the current string,
+		 * appends the parameter string, and returns the updated copy.
+		 * @param string The string to append.
+		 * @return A copy of this string with the parameter string appended.
+		 */
+		WoopsiString operator+(const WoopsiString& string);
+
+		/**
+		 * Overloaded compound addition/assignment operator.  Appends the
+		 * parameter string to the current string.
+		 * @param string The string to append.
+		 * @return This string.
+		 */
+		WoopsiString& operator+=(const WoopsiString& string);
+
+		/**
+		 * Overloaded equality operator.  Checks if this string and the supplied
+		 * argument are equal.
+		 * @param string The string to compare with.
+		 * @return True if the strings are equal; false if not.
+		 */
+		bool operator==(const WoopsiString& string) { return compareTo(string) == 0; };
+
+		/**
+		 * Overloaded inequality operator.  Checks if this string and the
+		 * supplied argument are not equal.
+		 * @param string The string to compare with.
+		 * @return False if the strings are equal; true if not.
+		 */
+		bool operator!=(const WoopsiString& string) { return compareTo(string) != 0; };
+
+		/**
 		 * Compares this string to the argument.
 		 * @param string String to compare to.
+		 * @param caseSensitive Performs a case-sensitive compare if this is set
+		 * to true.
 		 * @return Zero if both strings are equal.  A value greater than zero
 		 * indicates that this string is greater than the argument string.  A
 		 * value less than zero indicates the opposite.  Note that the return
 		 * value indicates the *byte* that does not match, not the *character*.
 		 */
-		virtual s32 compareTo(const WoopsiString& string) const;
+		virtual s8 compareTo(const WoopsiString& string, bool caseSensitive = false) const;
+
+		/**
+		 * Gets the character index of the first occurence of the supplied char
+		 * array within the string.  If the char array is not found, the method
+		 * will return -1.
+		 * @param text The char array to find.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 indexOf(const char* text) const;
+
+		/**
+		 * Gets the character index of the first occurence after startIndex of
+		 * the supplied char array within the string.  If the char array is not
+		 * found, the method will return -1.
+		 * @param text The char array to find.
+		 * @param startIndex The index to start searching from.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 indexOf(const char* text, s32 startIndex) const;
+
+		/**
+		 * Gets the character index of the first occurence of the supplied
+		 * string within the bounds of the current string between startIndex and
+		 * startIndex + count.  If the string is not found, the method will
+		 * return -1.
+		 * @param text The char array to find.
+		 * @param startIndex The index to start searching from.
+		 * @param count The number of characters to examine.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 indexOf(const WoopsiString& text, s32 startIndex, s32 count) const;
+
+		/**
+		 * Gets the character index of the last occurence of the supplied char
+		 * array within the string.  If the char array is not found, the method
+		 * will return -1.
+		 * @param text The char array to find.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 lastIndexOf(const char* text) const;
+
+		/**
+		 * Gets the character index of the last occurence after startIndex of
+		 * the supplied char array within the string.  If the char array is not
+		 * found, the method will return -1.
+		 * @param text The char array to find.
+		 * @param startIndex The index to start searching from.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 lastIndexOf(const char* text, s32 startIndex) const;
+
+		/**
+		 * Gets the character index of the last occurence of the supplied
+		 * string within the bounds of the current string between startIndex and
+		 * startIndex - count.  If the string is not found, the method will
+		 * return -1.
+		 * @param text The char array to find.
+		 * @param startIndex The index to start searching from.
+		 * @param count The number of characters to examine.
+		 * @return The index of the char array within the current string if it
+		 * exists, or -1 if it does not.
+		 */
+		s32 lastIndexOf(const WoopsiString& text, s32 startIndex, s32 count) const;
+
+		/**
+		 * Formats the supplied char array using standard printf() syntax.  The
+		 * formatted text replaces the contents of the current string object.
+		 * @param format The format to use.
+		 * @param ... The formatting arguments.
+		 */
+		void format(const char *format, ...);
+
+		/**
+		 * Formats the supplied char array using standard printf() syntax.  The
+		 * formatted text replaces the contents of the current string object.
+		 * Note that va_start() must be called before this method is used, and
+		 * va_end() must be called when it finishes.
+		 *
+		 * Note that the compiler message regarding va_list mangling changes
+		 * in GCC 4.4 are not problems with Woopsi's code.  They are the result
+		 * of the GCC team bizarrely deciding to include news items in compiler
+		 * messages:
+		 * http://gcc.gnu.org/bugzilla/show_bug.cgi?id=42748
+		 *
+		 * @param format The format to use.
+		 * @param args The formatting arguments.
+		 */
+		void format(const char *format, va_list args);
+
+		/**
+		 * Replace all instances of oldText within the current string with
+		 * newText.
+		 * @param oldText The text to search for and replace.
+		 * @param newText The new text that will appear in place of the old.
+		 */
+		void replace(const WoopsiString& oldText, const WoopsiString& newText);
+
+		/**
+		 * Replace all instances of oldText within the current string from
+		 * startIndex onwards with newText.
+		 * @param oldText The text to search for and replace.
+		 * @param newText The new text that will appear in place of the old.
+		 * @param startIndex The index to start replacing from.
+		 */
+		void replace(const WoopsiString& oldText, const WoopsiString& newText,  const s32 startIndex);
+
+		/**
+		 * Replace the text between the bounds defined by startIndex and 
+		 * startIndex + count with newText.
+		 * @param startIndex The index to start replacing from.
+		 * @param count The number of characters to replace.
+		 * @param newText The new text that will appear in place of the old.
+		 */
+		void replace(const s32 startIndex, const s32 count, const WoopsiString& newText);
+
+		/**
+		 * Replace the first replaceCount instances of oldText within the
+		 * current string from startIndex onwards with newText.
+		 * @param oldText The text to search for and replace.
+		 * @param newText The new text that will appear in place of the old.
+		 * @param startIndex The index to start replacing from.
+		 * @param replaceCount The number of replacements to make.
+		 */
+		void replace(const WoopsiString& oldText, const WoopsiString& newText, const s32 startIndex, const s32 replaceCount);
+
+		/**
+		 * Splits the string into substrings divided by the supplied separator.
+		 * The substrings will be placed in the result WoopsiArray.
+		 * @param separator String used to divide this string.
+		 * @param result Will be populated with the subsections of the divided
+		 * string.
+		 */
+		void split(const WoopsiString& separator, WoopsiArray<WoopsiString>& result) const;
+
+		/**
+		 * Splits the string into substrings divided by the supplied separator.
+		 * The substrings will be placed in the result WoopsiArray.
+		 * @param separator String used to divide this string.
+		 * @param allowEmptyEntries If set to false, any empty substrings
+		 * produced by the dividing process will not be added to the result
+		 * array.
+		 * @param result Will be populated with the subsections of the divided
+		 * string.
+		 */
+		void split(const WoopsiString& separator, bool allowEmptyEntries, WoopsiArray<WoopsiString>& result) const;
 
 	protected:
 		char* _text;							/**< Raw char array data */
+
+		/**
+		 * Initialise the string's default state; called by constructors.
+		 */
+		virtual void init();
 
 		/**
 		 * Allocate memory for the string.
@@ -318,16 +531,16 @@ namespace WoopsiGfx {
 		 * the codepoint once the method ends.
 		 * @return The codepoint.  Returns 0 if the codepoint is invalid.
 		 */
-		u32 getCodePoint(const char* string, u8* numChars) const;
+		u32 getCodePoint(const char* string, u8* numChars = NULL) const;
 
 	private:
 		friend class StringIterator;
 		
-		s32 _dataLength;		/**< Length of char data in the string */
-		s32 _stringLength;		/*< Number of unicode tokens in the string */
-		s32 _allocatedSize;		/**< Number of bytes allocated for this string */
-		s32 _growAmount;		/**< Number of chars that the string grows by
-									 whenever it needs to get larger */
+		s32 _dataLength;	/**< Length of char data in the string */
+		s32 _stringLength;	/**< Number of unicode tokens in the string */
+		s32 _allocatedSize;	/**< Number of bytes allocated for this string */
+		s32 _growAmount;	/**< Number of chars that the string grows by
+								 whenever it needs to get larger */
 									 
 		/**
 		 * Encodes a codepoint into its UTF-8 representation.  Will allocate
@@ -339,7 +552,7 @@ namespace WoopsiGfx {
 		 * @param numBytes The number of bytes in the encoded data.
 		 * @return The encoded codepoint.
 		 */
-		 const char* encodeCodePoint(u32 codePoint, u8* numBytes) const;
+		 const char* encodeCodePoint(u32 codePoint, u8* numBytes = NULL) const;
 	};
 }
 
