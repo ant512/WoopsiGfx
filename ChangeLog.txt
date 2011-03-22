@@ -1,6 +1,32 @@
 Change Log
 ----------
 
+  V1.3
+
+  - Fixes:
+    - Font getCharWidth() and getCharHeight() methods return u8 instead of u16.
+    - Removed Rect::fromDimensions().
+    - Rect::fromCoordinates() returns a Rect instead of a Rect*.
+    - WoopsiArray resizes more intelligently.
+    - WoopsiString::subString() returns a WoopsiString instead of a
+      WoopsiString*.
+    - WoopsiString::compareTo() returns an s8 instead of an s32.
+
+  - New Features:
+    - Added drawBaselineChar() to font classes.
+    - Added drawBaselineText() to font classes.
+    - Added getCharTop() to font classes.
+    - Added Rect::splitIntersection().
+    - Added StringIterator::getInteger().
+    - Added new WoopsiString constructors.
+    - Added new WoopsiString::setText() overload.
+    - Added new WoopsiString operator overloads.
+    - Added WoopsiString::indexOf().
+    - Added WoopsiString::lastIndexOf().
+    - Added WoopsiString::format().
+    - Added WoopsiString::replace().
+    - Added WoopsiString::split().
+
   V1.2 (20101210)
   
   - Fixes:
