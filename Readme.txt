@@ -59,8 +59,8 @@ Installation
   structure:
   
     C:\devkitPro\libwoopsigfx\icon
-	C:\devkitPro\libwoopsigfx\include
-	C:\devkitPro\libwoopsigfx\lib
+    C:\devkitPro\libwoopsigfx\include
+    C:\devkitPro\libwoopsigfx\lib
 
   Alternatively, if you have installed devKitPro to the default directory
   (C:\devkitPro in Windows, or /opt/devkitpro in Linux/OSX), you can run the
@@ -96,4 +96,4 @@ Links
 Email
 -----
 
-  Contact me at spam_mail250@yahoo.com.
+  Contact me at ant@woopsi.org.
