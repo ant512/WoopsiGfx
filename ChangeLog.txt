@@ -11,6 +11,16 @@ Change Log
     - WoopsiString::subString() returns a WoopsiString instead of a
       WoopsiString*.
     - WoopsiString::compareTo() returns an s8 instead of an s32.
+    - Removed ability to set font draw colour/monochrome from font classes;
+      replaced with explicit "colour" parameter to all draw methods.
+    - Removed height member from FontBase and transplanted all methods to
+      PackedFontBase, making FontBase data free.
+    - Removed width and height members from BitmapBase and transplanted to
+      BitmapWrapper, FrameBuffer and Bitmap.
+    - Removed constructor from FontBase.
+    - Fixed bugs in Graphics::floodFill().
+    - Stack methods in Graphics class expect a reference to a stack as a
+      parameter instead of pointer.
 
   - New Features:
     - Added drawBaselineChar() to font classes.

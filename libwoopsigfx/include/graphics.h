@@ -323,21 +323,10 @@ namespace WoopsiGfx {
 		 * @param startIndex The start index within the string from which
 		 * drawing will commence.
 		 * @param length The number of characters to draw.
-		 * @param colour The colour of the string.
+		 * @param colour The colour of the string.  If this is not specified the
+		 * font's default colour will be used.
 		 */
-		virtual void drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour);
-		
-		/**
-		 * Draw a string to the internal bitmap in a specific colour.
-		 * @param x The x co-ordinate of the string.
-		 * @param y The y co-ordinate of the string.
-		 * @param font The font to draw with.
-		 * @param string The string to output.
-		 * @param startIndex The start index within the string from which
-		 * drawing will commence.
-		 * @param length The number of characters to draw.
-		 */
-		virtual void drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length);
+		virtual void drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour = 0);
 
 		/**
 		 * Draw a portion of a string on a baseline (chars may have different
@@ -349,8 +338,10 @@ namespace WoopsiGfx {
 		 * @param startIndex The start index within the string from which
 		 * drawing will commence.
 		 * @param length The number of characters to draw.
+		 * @param colour The colour of the string.  If this is not specified the
+		 * font's default colour will be used.
 		 */		 
-        void drawBaselineText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length);		
+        void drawBaselineText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour = 0);		
 		
 		/**
 		 * Scroll a region by a specified distance in two dimensions.  Performs
@@ -444,9 +435,9 @@ namespace WoopsiGfx {
 		 * function).
 		 * @param y The y co-ordinate of the pixel from the stack (output by the
 		 * function).
-		 * @param stack Pointer to the stack to pop from.
+		 * @param stack The stack to pop from.
 		 */
-		bool popStack(s16* x, s16* y, WoopsiArray<s32>* stack);
+		bool popStack(s16* x, s16* y, WoopsiArray<s32>& stack);
 		
 		/**
 		 * Push new co-ordinates onto the stack.
@@ -454,7 +445,7 @@ namespace WoopsiGfx {
 		 * @param y The y co-ordinate of the pixel to add to the stack.
 		 * @param stack The stack to add a new value to.
 		 */
-		void pushStack(s16 x, s16 y, WoopsiArray<s32>* stack);
+		void pushStack(s16 x, s16 y, WoopsiArray<s32>& stack);
 
 		/**
 		 * Get the clipping code for the given co-ordinates based on the

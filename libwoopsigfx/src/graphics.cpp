@@ -223,7 +223,7 @@ void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string
 	drawText(x, y, font, string, 0, string.getLength());
 }
 
-void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length) {
+void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour) {
 
 	s16 clipX1 = _clipRect.x;
 	s16 clipY1 = _clipRect.y;
@@ -248,7 +248,7 @@ void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string
 		
 	if (iterator->moveTo(startIndex)) {
 		do {
-			x = font->drawChar(_bitmap, iterator->getCodePoint(), x, y, clipX1, clipY1, clipX2, clipY2);
+			x = font->drawChar(_bitmap, iterator->getCodePoint(), colour, x, y, clipX1, clipY1, clipX2, clipY2);
 
 			// Abort if x pos outside clipping region
 			if (x > clipX2) break;
@@ -258,7 +258,7 @@ void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string
 	delete iterator;
 }
 
-void Graphics::drawBaselineText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length) {
+void Graphics::drawBaselineText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour) {
 
 	s16 clipX1 = _clipRect.x;
 	s16 clipY1 = _clipRect.y;
@@ -273,31 +273,10 @@ void Graphics::drawBaselineText(s16 x, s16 y, FontBase* font, const WoopsiString
 	// where to stop rendering anyway clipping will be done in the font, on a char basis 
 	if (iterator->moveTo(startIndex)) {
 		do {
-		        x = font->drawBaselineChar(_bitmap, iterator->getCodePoint(), x, y, clipX1, clipY1, clipX2, clipY2);
+		        x = font->drawBaselineChar(_bitmap, iterator->getCodePoint(), colour, x, y, clipX1, clipY1, clipX2, clipY2);
 		} while (iterator->moveToNext() && (iterator->getIndex() < startIndex + length));
 	}
 	delete iterator;
-}
-
-// Print a string in a specific colour
-void Graphics::drawText(s16 x, s16 y, FontBase* font, const WoopsiString& string, s32 startIndex, s32 length, u16 colour) {
-
-	// Store current font colour
-	bool isMonochrome = font->isMonochrome();
-	u16 oldColour = font->getColour();
-
-	// Update font colour
-	font->setColour(colour);
-
-	// Output as normal
-	drawText(x, y, font, string, startIndex, length);
-
-	// Reset colour
-	if (!isMonochrome) {
-		font->clearColour();
-	} else {
-		font->setColour(oldColour);
-	}
 }
 
 void Graphics::drawXORPixel(s16 x, s16 y) {
@@ -399,7 +378,7 @@ void Graphics::floodFill(s16 x, s16 y, u16 newColour) {
 	if (oldColour == newColour) return;
 
 	// Initalise stack
-	WoopsiArray<s32>* stack = new WoopsiArray<s32>();
+	WoopsiArray<s32> stack;
 
 	s16 x1;
 	u8 spanUp, spanDown;
@@ -434,15 +413,15 @@ void Graphics::floodFill(s16 x, s16 y, u16 newColour) {
 			if ((!spanUp) && (y > _clipRect.y) && (_bitmap->getPixel(x1, y - 1) == oldColour)) {
 				pushStack(x1, y - 1, stack);
 				spanUp = 1;
-			} else if ((spanUp) && (_clipRect.y > 0) && (_bitmap->getPixel(x1, y - 1) != oldColour)) {
+			} else if ((spanUp) && (y > _clipRect.y) && (_bitmap->getPixel(x1, y - 1) != oldColour)) {
 				spanUp = 0;
 			}
 
 			// Check pixel below
-			if ((!spanDown) && (_clipRect.y < _clipRect.height - 1) && (_bitmap->getPixel(x1, y + 1) == oldColour)) {
+			if ((!spanDown) && (y < _clipRect.height - 1) && (_bitmap->getPixel(x1, y + 1) == oldColour)) {
 				pushStack(x1, y + 1, stack);
 				spanDown = 1;
-			} else if ((spanDown) && (_clipRect.y < _clipRect.height - 1) && (_bitmap->getPixel(x1, y + 1) != oldColour)) {
+			} else if ((spanDown) && (y < _clipRect.height - 1) && (_bitmap->getPixel(x1, y + 1) != oldColour)) {
 				spanDown = 0;
 			}
 
@@ -453,25 +432,23 @@ void Graphics::floodFill(s16 x, s16 y, u16 newColour) {
 		// Draw line
 		drawHorizLine(rowStart, y, rowWidth, newColour);
 	}
-
-	delete stack;
 }
 
 // Floodfill stack functions
-bool Graphics::popStack(s16* x, s16* y, WoopsiArray<s32>* stack) { 
-	if (stack->size() > 0) { 
-		s32 val = stack->at(stack->size() - 1);
+bool Graphics::popStack(s16* x, s16* y, WoopsiArray<s32>& stack) { 
+	if (stack.size() > 0) { 
+		s32 val = stack.at(stack.size() - 1);
 		*y = val / _width;
 		*x = val % _width;
-		stack->pop_back();
+		stack.pop_back();
 		return true;
 	}
 
 	return false;  
 }
 
-void Graphics::pushStack(s16 x, s16 y, WoopsiArray<s32>* stack) {
-	stack->push_back(x + (y * _width));
+void Graphics::pushStack(s16 x, s16 y, WoopsiArray<s32>& stack) {
+	stack.push_back(x + (y * _width));
 }
 
 //Draw bitmap to the internal bitmap
