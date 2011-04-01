@@ -124,6 +124,8 @@ namespace WoopsiGfx {
 	protected:
 		u16* _bitmap __attribute__ ((aligned (4)));		/**< Bitmap */
 		u16* _buffer __attribute__ ((aligned (4)));		/**< Buffer */
+		u16 _width;										/**< Width of the bitmap */
+		u16 _height;									/**< Height of the bitmap */
 		
 		/**
 		 * Copy constructor is protected to prevent usage.
