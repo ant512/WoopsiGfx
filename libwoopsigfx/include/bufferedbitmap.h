@@ -120,6 +120,18 @@ namespace WoopsiGfx {
 		 * buffer() method.
 		 */
 		void unbuffer();
+		
+		/**
+		 * Get the bitmap's width.
+		 * @return The bitmap's width.
+		 */
+		inline const u16 getWidth() const { return _width; };
+
+		/**
+		 * Get the bitmap's height.
+		 * @return The bitmap's height.
+		 */
+		inline const u16 getHeight() const { return _height; };
 
 	protected:
 		u16* _bitmap __attribute__ ((aligned (4)));		/**< Bitmap */
