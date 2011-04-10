@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+  V1.4
+
+  - Fixes:
+    - Animation::play() stops if there are no frames to play.
+
   V1.3
 
   - Fixes:
