@@ -1,4 +1,3 @@
-#include <nds.h>
 #include "dmafuncs.h"
 
 void woopsiDmaCopy(const u16* source, u16* dest, u32 count) {
