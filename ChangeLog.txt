@@ -7,7 +7,8 @@ Change Log
     - Animation::play() stops if there are no frames to play.
     - Animation::getCurrentFrame() returns NULL if there are no frames.
     - Animation::getCurrentBitmap() returns NULL if there are no bitmaps.
-    - StringIterator::moveTo() ignores attempts to move to negatice indices.
+    - StringIterator::moveTo() ignores attempts to move to negative indices.
+    - Improved use of DMA hardware.
 
   V1.3
 
