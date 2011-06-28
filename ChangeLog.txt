@@ -9,6 +9,8 @@ Change Log
     - Animation::getCurrentBitmap() returns NULL if there are no bitmaps.
     - StringIterator::moveTo() ignores attempts to move to negative indices.
     - Improved use of DMA hardware.
+    - WoopsiString::subString() passes the correct arguments to the WoopsiString
+      constructor.
 
   V1.3
 
