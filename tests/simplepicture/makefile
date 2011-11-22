@@ -5,7 +5,7 @@
 # set the texts that appear in the loader menus
 TEXT1 		:= Demo Project
 TEXT2 		:= using WoopsiGfx
-TEXT3 		:= ant.simianzombie.com
+TEXT3 		:= simianzombie.com
 
 # 4-bit-deep bitmap file to use as icon in loader menus
 ICON 		:= $(DEVKITPRO)/libwoopsigfx/icon/logo.bmp

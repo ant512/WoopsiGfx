@@ -89,8 +89,7 @@ Credits and Acknowledgements
 Links
 -----
 
-  - http://ant.simianzombie.com                      - Development blog
-  - http://ant.simianzombie.com/forum                - Forum
+  - http://simianzombie.com                          - Development blog
 
 
 Email
