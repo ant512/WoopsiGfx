@@ -1,15 +1,15 @@
 WoopsiGfx
----------
+=========
 
-  WoopsiGfx is a C++ 2D graphics library for the Nintendo DS, derived from the
-  Woopsi GUI framework.  It allows the developer to create and manipulate
-  bitmaps using a comprehensive set of drawing tools.  It includes an extensible
-  font system for drawing text to bitmaps, and features support for packed
-  monochrome and 16-bit fonts out of the box.
-  
-  WoopsiGfx can also be used to draw directly to the DS' VRAM.  This is useful
-  when the DS is in MODE_FB0 or MODE_5_2D.
-  
+WoopsiGfx is a C++ 2D graphics library for the Nintendo DS, derived from the
+Woopsi GUI framework.  It allows the developer to create and manipulate bitmaps
+using a comprehensive set of drawing tools.  It includes an extensible font
+system for drawing text to bitmaps, and features support for packed monochrome
+and 16-bit fonts out of the box.
+
+WoopsiGfx can also be used to draw directly to the DS' VRAM.  This is useful
+when the DS is in MODE_FB0 or MODE_5_2D.
+
 
 Features
 --------
@@ -46,35 +46,26 @@ Features
 Requirements
 ------------
 
-  To compile the project you need devKitARM.
+To compile the project you need devKitARM.
 
 
 Installation
 ------------
 
-  Create a new directory called "libwoopsigfx" in your devkitPro directory.  In
-  Windows, for example, this would typically be "C:\devkitPro".  Copy the
-  "icon", "lib" and "include" directories from this archive into the new
-  directory.  In Windows, you will end up with the following directory
-  structure:
-  
+Create a new directory called "libwoopsigfx" in your devkitPro directory.  In
+Windows, for example, this would typically be "C:\devkitPro".  Copy the "icon",
+"lib" and "include" directories from this archive into the new directory.  In
+Windows, you will end up with the following directory structure:
+
     C:\devkitPro\libwoopsigfx\icon
     C:\devkitPro\libwoopsigfx\include
     C:\devkitPro\libwoopsigfx\lib
 
-  Alternatively, if you have installed devKitPro to the default directory
-  (C:\devkitPro in Windows, or /opt/devkitpro in Linux/OSX), you can run the
-  deploy script in the libwoopsigfx folder of this archive.  Windows users
-  should double-click the "deploy.bat" file.  Linux/OSX users should open a
-  shell, navigate to the libwoopsigfx folder, and run "sudo bash deploy.sh".
-  Type in your password when prompted.  These scripts will copy the necessary
-  files automatically.
+Once you've done installed WoopsiGfx, you can test the installation by trying to
+compile the "simplepicture" example project in the "tests" folder of this
+archive.  Open a shell, navigate to its directory, and type "make".  If this
+successfully produces a ROM file then the installation worked.
 
-  Once you've done installed WoopsiGfx, you can test the installation by trying
-  to compile the "simplepicture" example project in the "tests" folder of this
-  archive.  Open a shell, navigate to its directory, and type "make".  If this
-  successfully produces a ROM file then the installation worked.
-	
 
 Credits and Acknowledgements
 ---------------------------
@@ -95,4 +86,4 @@ Links
 Email
 -----
 
-  Contact me at ant@woopsi.org.
+Contact me at <ant@woopsi.org>.
