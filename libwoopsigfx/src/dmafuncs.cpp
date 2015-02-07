@@ -12,12 +12,14 @@ void woopsiDmaCopy(const u16* source, u16* dest, u32 count) {
 	bmp[1] = 0x06400000;
 
 	// Use DMA hardware if both source and destination are within VRAM
-	if ((dsta >= bmp[0]) && (dsta < bmp[1]) && (srca >= bmp[0]) && (srca < bmp[0])) {
+	if ((dsta >= bmp[0]) && (dsta < bmp[1]) && (srca >= bmp[0]) && (srca < bmp[1])) {
 
 		// libnds DMA functions work in bytes
 		count *= 2;
 
 		DC_FlushRange(source, count);
+
+		while (dmaBusy(3)) {}
 
 		// Choose fastest DMA copy mode
 		if((srca|dsta|count) & 3)
@@ -55,6 +57,8 @@ void woopsiDmaFill(u16 fill, u16* dest, u32 count) {
 
 			// libnds DMA functions work in bytes
 			count *= 2;
+
+			while (dmaBusy(3)) {}
 
 			if((dsta|count) & 3)
 				dmaFillHalfWords(fill, dest, count);
